@@ -1,6 +1,6 @@
 Gem::Specification.new do |spec|
     spec.name          = "rcsv"
-    spec.version       = "1.0.0"
+    spec.version       = "0.1.3"
     spec.summary       = "An easy to use CSV parser and text formatter."
     spec.authors       = ["Sam Watson"]
     spec.email         = ["user@mail.com"]
