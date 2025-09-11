@@ -1,0 +1,32 @@
+#!/usr/bin/env ruby
+require "rcsv"
+
+input_file = nil
+output_file = nil
+filter_column = nil
+
+i = 0
+while i < ARGV.size
+    case ARGV[i]
+    when "-if", "--input"
+        i += 1
+        input_file = ARGV[i]
+    when "-of", "--output"
+        i += 1
+        output_file = ARGV[i]
+    when "-ff", "--filter-for"
+        i += 1
+        filter_column = ARGV[i]
+    else
+        puts "Unknown argument: #{ARGV[i]}"
+        exit 1
+    end
+    i += 1
+end
+
+if input_file.nil? || output_file.nil?
+    warn "USE: rcsv -if <input.csv> -of <output.txt> [-ff <filter_column>]\nOR rcsv --input <input.csv> --output <output.txt> [--filter-for <filter_column>]"
+    exit 1
+end
+
+RCSV.run(input_file, output_file, filter_column)
