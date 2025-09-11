@@ -1,10 +1,10 @@
 #! RubyCSV - A Ruby library for handling CSV files and outputting formatted TXT results
-#! (c) 2025 samdoesnerdstuff / [removed] - BSD-2-Clause
+#! (c) 2025 samdoesnerdstuff / Sam Watson - BSD-2-Clause
 #! See LICENSE file for more info
 require 'csv'
 
 module RCSV
-  VERSION = "0.1.4"
+  VERSION = "0.1.5"
 
   def self.run(in_file, out_file, filter_col = nil)
     begin
@@ -58,6 +58,6 @@ module RCSV
       f.puts formatted_lines
     end
 
-    puts "Processed #{rows.size} rows -> #{out_file}"
+    puts "Processed #{rows.size} rows to #{out_file}"
   end
 end
