@@ -21,10 +21,10 @@ ruby exe/rcsv -if data.csv -of output.txt -ff ImportantThing
 **Longhand Version:**
 ```
 # For *NIX machines
-rcsv --input purchases.csv --output formatted.txt --filter-for CardNum
+rcsv --input purchases.csv --output formatted.txt --filter-for "column" "value"
 
 # For Windows
-ruby exe/rcsv --input purchases.csv --output formatted.txt --filter-for CardNum
+ruby exe/rcsv --input purchases.csv --output formatted.txt --filter-for "column" "value"
 ```
 
 ## Performance
