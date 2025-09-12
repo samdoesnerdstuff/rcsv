@@ -11,12 +11,20 @@ There are only three switches for rcsv. The flags for input / output files and o
 
 **Shorthand Version:**
 ```
+#For *NIX machines
 rcsv -if data.csv -of output.txt -ff ImportantThing
+
+# For Windows
+ruby exe/rcsv -if data.csv -of output.txt -ff ImportantThing
 ```
 
 **Longhand Version:**
 ```
-rcsv --input purchases.csv --output formatted.txt --filter-for CardNum
+# For *NIX machines
+rcsv --input purchases.csv --output formatted.txt --filter-for "column" "value"
+
+# For Windows
+ruby exe/rcsv --input purchases.csv --output formatted.txt --filter-for "column" "value"
 ```
 
 ## Performance
@@ -24,6 +32,8 @@ rcsv --input purchases.csv --output formatted.txt --filter-for CardNum
 Tests were done on [preset data](https://www.datablist.com/learn/csv/download-sample-csv-files) of varying sizes, from 100 entries to 10000 entries. Files over 10000 entries may take significantly longer to execute, and in that case I advise using a superior parser, as rcsv is meant for small ( < 10000 records ) CSV files.
 
 <!-- PowerShell command: $results = @(); for ($i = 0; $i -lt 100; $i++) { $results += Measure-Command { ruby exe/rcsv -if customers-10000.csv -of out.txt -ff "Customer Id" } }; Write-Host $results -->
+
+<!-- Shell command: ... -->
 
 | Entries | Avg. Time (ms) | Platform |
 | ------- | -------------- | -------- |

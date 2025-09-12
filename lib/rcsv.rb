@@ -6,7 +6,7 @@ require 'csv'
 module RCSV
   VERSION = "0.1.5"
 
-  def self.run(in_file, out_file, filter_col = nil)
+  def self.run(in_file, out_file, filter_col = nil, filter_value = nil)
     begin
       rows = CSV.read(in_file, headers: true, return_headers: false, encoding: "bom|utf-8")
     rescue CSV::MalformedCSVError => e
@@ -18,8 +18,8 @@ module RCSV
     # (Thanks, Gemini!)
     headers = rows.headers
 
-    if filter_col
-      rows = rows.select { |row| row[filter_col] && !row[filter_col].strip.empty? }
+    if filter_col && filter_value
+      rows = rows.select { |row| row[filter_col].to_s.strip == filter_value.to_s.strip }
     end
 
     if rows.empty?
