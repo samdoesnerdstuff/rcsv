@@ -35,7 +35,7 @@ Tests were done on [preset data](https://www.datablist.com/learn/csv/download-sa
 
 <!-- Shell command: ... -->
 
-| Entries | Avg. Time (ms) | Platform |
+<!-- | Entries | Avg. Time (ms) | Platform |
 | ------- | -------------- | -------- |
 | 100 | UNTESTED | UNTESTED |
 | 1000 | 711.4 | Windows 11 |
