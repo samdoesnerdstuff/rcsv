@@ -1,35 +1,26 @@
 #!/usr/bin/env ruby
+require "optparse"
 require "rcsv"
 
-input_file = nil
-output_file = nil
-filter_column = nil
-filter_value = nil
+options = {}
 
-i = 0
-while i < ARGV.size
-    case ARGV[i]
-    when "-if", "--input"
-        i += 1
-        input_file = ARGV[i]
-    when "-of", "--output"
-        i += 1
-        output_file = ARGV[i]
-    when "-ff", "--filter-for"
-        i += 1
-        filter_column = ARGV[i]
-        i += 1
-        filter_value = ARGV[i]
-    else
-        puts "Unknown argument: #{ARGV[i]}"
-        exit 1
-    end
-    i += 1
+OptionParser.new do |opts|
+  opts.banner = "Usage: rcsv [options]"
+
+  opts.on("-iFILE", "--input FILE", "Input CSV file") { |v| options[:input] = v }
+  opts.on("-oFILE", "--output FILE", "Output TXT file") { |v| options[:output] = v }
+  opts.on("-fCOLUMN VALUE", "--filter-for COLUMN VALUE", Array, "Filter rows") do |v|
+    options[:filter_col], options[:filter_val] = v
+  end
+  opts.on("-h", "--help", "Show this message") do
+    puts opts
+    exit
+  end
+end.parse!
+
+if options[:input].nil? || options[:output].nil?
+  warn "Missing input or output file.\n\nUse -h for help."
+  exit 1
 end
 
-if input_file.nil? || output_file.nil?
-    warn "USE: rcsv -if <input.csv> -of <output.txt> [-ff <column> <value>]\nOR rcsv --input <input.csv> --output <output.txt> [--filter-for <column> <value>]"
-    exit 1
-end
-
-RCSV.run(input_file, output_file, filter_column, filter_value)
+RCSV.run(options[:input], options[:output], options[:filter_col], options[:filter_val])

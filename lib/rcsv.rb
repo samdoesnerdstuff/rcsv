@@ -4,60 +4,66 @@
 require 'csv'
 
 module RCSV
-  VERSION = "0.1.5"
+  VERSION = "0.2.0"
+  AUTHOR  = "samdoesnerdstuff"
+  LICENSE = "BSD-2-Clause"
 
-  def self.run(in_file, out_file, filter_col = nil, filter_value = nil)
-    begin
-      rows = CSV.read(in_file, headers: true, return_headers: false, encoding: "bom|utf-8")
-    rescue CSV::MalformedCSVError => e
-      puts "Error reading CSV file: #{e.message}"
-      return
+  class << self
+    def run(in_file, out_file, filter_col = nil, filter_value = nil, verbose: true, &block)
+      unless File.exist?(in_file)
+        warn "Input file not found: #{in_file}" if verbose
+        return
+      end
+
+      begin
+        rows = CSV.read(in_file, headers: true, encoding: "bom|utf-8")
+      rescue CSV::MalformedCSVError => e
+        warn "Error reading CSV file: #{e.message}" if verbose
+        return
+      end
+
+      headers = rows.headers
+
+      # Filtering: either by column/value or by block
+      rows = if block_given?
+               rows.select(&block)
+             elsif filter_col && filter_value
+               rows.select { |r| r[filter_col].to_s.strip.casecmp?(filter_value.to_s.strip) }
+             else
+               rows
+             end
+
+      if rows.empty?
+        msg = "No data found."
+        File.write(out_file, msg + "\n")
+        puts msg if verbose
+        return
+      end
+
+      col_widths = headers.map do |h|
+        [h.length, rows.filter_map { |r| r[h]&.to_s&.length }.max || 0].max
+      end
+
+      formatted = []
+      formatted << headers.each_with_index.map { |h, i| h.ljust(col_widths[i]) }.join(" | ")
+      formatted << col_widths.map { |w| "-" * w }.join("-+-")
+
+      rows.each do |row|
+        formatted << headers.each_with_index.map { |h, i| align(row[h].to_s, col_widths[i]) }.join(" | ")
+      end
+
+      File.write(out_file, formatted.join("\n") + "\n")
+      puts "Processed #{rows.size} rows to #{out_file}" if verbose
     end
 
-    # Store headers before filtering. The headers should always be from the original file.
-    # (Thanks, Gemini!)
-    headers = rows.headers
+    private
 
-    if filter_col && filter_value
-      rows = rows.select { |row| row[filter_col].to_s.strip == filter_value.to_s.strip }
+    def align(val, width)
+      if val =~ /\A-?\d+(\.\d+)?\z/
+        val.rjust(width)
+      else
+        val.ljust(width)
+      end
     end
-
-    if rows.empty?
-      puts "No rows to process after filtering."
-      File.open(out_file, "w") { |f| f.puts "No data found." }
-      return
-    end
-
-    # Determine col width based on the max len of headers and data
-    col_widths = headers.map do |h|
-      max_data_len = rows.map { |r| r[h].to_s.length }.max || 0
-      [h.length, max_data_len].max
-    end
-
-    formatted_lines = []
-
-    # Format header row and separator line
-    formatted_lines << headers.each_with_index.map { |h, i| h.ljust(col_widths[i]) }.join(" | ")
-    formatted_lines << col_widths.map { |w| "-" * w }.join("-+-")
-
-    # Data rows (*very* important)
-    rows.each do |row|
-      formatted_lines << headers.each_with_index.map { |h, i|
-        val = row[h].to_s
-        # Right-align if a number
-        if val =~ /\A-?\d+(\.\d+)?\z/
-          val.rjust(col_widths[i])
-        else
-          val.ljust(col_widths[i])
-        end
-      }.join(" | ")
-    end
-
-    # Write formatted output to the file
-    File.open(out_file, "w") do |f|
-      f.puts formatted_lines
-    end
-
-    puts "Processed #{rows.size} rows to #{out_file}"
   end
 end
